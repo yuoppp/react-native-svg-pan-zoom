@@ -176,13 +176,15 @@ export default class SvgPanZoom extends Component {
             scaleAnimation: new Animated.Value(vt.scaleX),
         };
     }
+
     componentWillMount() {
         this.state.scaleAnimation.addListener((zoom) => { this.props.onZoom(zoom.value); });
+
         this.prInstance = PanResponder.create({
-            onStartShouldSetPanResponder: (evt, gestureState) => false,
-            onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
-            onMoveShouldSetPanResponder: (evt, gestureState) => true,
-            onMoveShouldSetPanResponderCapture: (evt, gestureState) => false,
+            onStartShouldSetPanResponder: this.props.onStartShouldSetPanResponder,
+            onStartShouldSetPanResponderCapture: this.props.onStartShouldSetPanResponderCapture,
+            onMoveShouldSetPanResponder: this.props.onMoveShouldSetPanResponder,
+            onMoveShouldSetPanResponderCapture: this.props.onMoveShouldSetPanResponderCapture,
             onPanResponderGrant: (evt, gestureState) => {
                 // Set self for filtering events from other PanResponderTarges
                 if (this.prTargetSelf == null) {
@@ -220,7 +222,7 @@ export default class SvgPanZoom extends Component {
                     this.processTouch(gestureState);
                 }
             },
-            onPanResponderTerminationRequest: (evt, gestureState) => true,
+            onPanResponderTerminationRequest: this.props.onPanResponderTerminationRequest,
             onPanResponderRelease: (evt, gestureState) => {
                 this.setState({
                     isScaling: false,
@@ -260,6 +262,7 @@ export default class SvgPanZoom extends Component {
         return viewTransformMult(createTranslationMatrix(-(canvasWidth - canvasWidth * scale) / 2, -(canvasHeight - canvasHeight * scale) / 2), createScalingMatrix(scale));
     }
 }
+
 SvgPanZoom.defaultProps = {
     canvasHeight: 1080,
     canvasWidth: 720,
@@ -269,4 +272,10 @@ SvgPanZoom.defaultProps = {
     canvasStyle: {},
     viewStyle: {},
     onZoom: (zoom) => { },
+
+    onStartShouldSetPanResponder: (evt, gestureState) => false,
+    onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+    onMoveShouldSetPanResponder: (evt, gestureState) => true,
+    onMoveShouldSetPanResponderCapture: (evt, gestureState) => false,
+    onPanResponderTerminationRequest: (evt, gestureState) => true,
 };
